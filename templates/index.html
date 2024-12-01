@@ -1,0 +1,56 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dolphin Image Classification</title>
+    <!-- Підключення зовнішнього файлу стилів -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Генерація зірок на фоні -->
+    <div id="stars"></div>
+
+    <div class="container">
+        <h1>Upload a Dolphin Image</h1>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <form action="/" method="post" enctype="multipart/form-data" id="upload-form">
+            <label for="file" class="file-upload-button">Choose an image</label>
+            <input type="file" id="file" name="file" accept="image/*">
+            <div id="image-container">
+                {% if image_data %}
+                    <img id="image-preview" src="data:{{ mime_type }};base64,{{ image_data }}" alt="Image Preview">
+                    <button type="button" class="delete-button" id="delete-button">Delete Image</button>
+                {% else %}
+                    <img id="image-preview" src="#" alt="Image Preview" style="display: none;">
+                    <button type="button" class="delete-button" id="delete-button" style="display: none;">Delete Image</button>
+                {% endif %}
+            </div>
+            {% if result %}
+                {% set percentage = confidence * 100 %}
+                {% set circumference = 2 * 3.1415926 * 54 %}
+                {% set progress = circumference * percentage / 100 %}
+                {% set color = 'green' if confidence > 0.5 else 'red' %}
+                <div class="result" id="result">
+                    <p>{{ result }}</p>
+                    <div class="progress-circle">
+                        <svg width="120" height="120">
+                            <circle class="bg" cx="60" cy="60" r="54"></circle>
+                            <circle class="progress" cx="60" cy="60" r="54"
+                                style="stroke-dasharray: {{ progress }}, {{ circumference }};
+                                       stroke: {{ color }};"></circle>
+                            <text x="60" y="60" text-anchor="middle" font-size="24" fill="#fff">{{ percentage|round(0) }}%</text>
+                        </svg>
+                    </div>
+                </div>
+            {% endif %}
+            <button type="submit" id="predict-button">Predict</button>
+        </form>
+    </div>
+
+    <!-- Підключення зовнішнього файлу скриптів -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
